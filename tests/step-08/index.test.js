@@ -110,11 +110,35 @@ test('Parse SQL Query with INNER JOIN', async () => {
     })
 });
 
+test('Parse SQL Query with INNER JOIN', async () => {
+    const query = 'SELECT student.name FROM student INNER JOIN enrollment ON student.id=enrollment.student_id';
+    const result = await parseQuery(query);
+    expect(result).toEqual({
+        fields: ['student.name'],
+        table: 'student',
+        whereClauses: [],
+        joinTable: 'enrollment',
+        joinCondition: { left: 'student.id', right: 'enrollment.student_id' }
+    })
+});
+
 test('Parse SQL Query with INNER JOIN and WHERE Clause', async () => {
     const query = 'SELECT student.name, enrollment.course FROM student INNER JOIN enrollment ON student.id = enrollment.student_id WHERE student.age > 20';
     const result = await parseQuery(query);
     expect(result).toEqual({
         fields: ['student.name', 'enrollment.course'],
+        table: 'student',
+        whereClauses: [{ field: 'student.age', operator: '>', value: '20' }],
+        joinTable: 'enrollment',
+        joinCondition: { left: 'student.id', right: 'enrollment.student_id' }
+    })
+});
+
+test('Parse SQL Query with INNER JOIN and WHERE Clause', async () => {
+    const query = 'SELECT student.name FROM student INNER JOIN enrollment ON student.id = enrollment.student_id WHERE student.age > 20';
+    const result = await parseQuery(query);
+    expect(result).toEqual({
+        fields: ['student.name'],
         table: 'student',
         whereClauses: [{ field: 'student.age', operator: '>', value: '20' }],
         joinTable: 'enrollment',
